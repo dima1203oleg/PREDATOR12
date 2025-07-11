@@ -1,0 +1,79 @@
+# Основний .gitignore для кореня репозиторію
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Віртуальні середовища
+venv/
+ENV/
+env/
+.venv
+.ENV
+.env
+*.env
+local_settings.py
+
+# IDE та редактори
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*~
+.project
+.pydevproject
+.settings/
+*.sublime-*
+.ropeproject/
+
+# Лог-файли та великі дані
+*.log
+*.sqlite3
+*.db
+*.dat
+*.csv
+*.tsv
+*.bak
+*.tmp
+*.pid
+*.gz
+*.zip
+*.tar
+*.rar
+*.7z
+
+# Файли з ключами та секретами
+.env
+.env.production
+secrets.env
+test_api_keys.env
+
+# Автоматичні конфігурації та аналізи
+auto_config*
+error_analysis*
+session_report*
+
+# Інше
+.DS_Store
+Thumbs.db
