@@ -36,6 +36,7 @@ class RemoteControl:
         self._settings = settings or DEFAULT_SETTINGS
         self._is_on = False
         self._current_channel = self._settings.default_channel
+        self._previous_channel: int | None = None
         self._volume = self._settings.default_volume
         self._muted = False
         self._previous_volume: int | None = None
@@ -51,6 +52,7 @@ class RemoteControl:
         self._previous_volume = None
         self._volume = self._settings.default_volume
         self._current_channel = self._settings.default_channel
+        self._previous_channel = None
 
     def power_off(self) -> None:
         """Turn the device off."""
@@ -58,6 +60,7 @@ class RemoteControl:
         self._is_on = False
         self._muted = False
         self._previous_volume = None
+        self._previous_channel = None
 
     def toggle_power(self) -> None:
         """Toggle the power state of the device."""
@@ -76,12 +79,14 @@ class RemoteControl:
         self._require_on()
         if not self._settings.min_channel <= channel <= self._settings.max_channel:
             raise RemoteStateError("Channel is outside of the allowed range.")
+        self._previous_channel = self._current_channel
         self._current_channel = channel
 
     def next_channel(self) -> None:
         """Advance to the next channel, wrapping around if needed."""
 
         self._require_on()
+        self._previous_channel = self._current_channel
         if self._current_channel >= self._settings.max_channel:
             self._current_channel = self._settings.min_channel
         else:
@@ -91,10 +96,23 @@ class RemoteControl:
         """Go to the previous channel, wrapping around if needed."""
 
         self._require_on()
+        self._previous_channel = self._current_channel
         if self._current_channel <= self._settings.min_channel:
             self._current_channel = self._settings.max_channel
         else:
             self._current_channel -= 1
+
+    def last_channel(self) -> None:
+        """Swap to the previously viewed channel, if any."""
+
+        self._require_on()
+        if self._previous_channel is None:
+            raise RemoteStateError("There is no previous channel to return to.")
+
+        self._current_channel, self._previous_channel = (
+            self._previous_channel,
+            self._current_channel,
+        )
 
     # ------------------------------------------------------------------
     # Volume management

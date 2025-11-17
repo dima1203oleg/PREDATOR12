@@ -50,6 +50,19 @@ class RemoteControlTestCase(unittest.TestCase):
         self.remote.previous_channel()
         self.assertEqual(self.remote.current_channel, self.remote.settings.max_channel)
 
+    def test_last_channel_tracks_previous(self) -> None:
+        self.remote.power_on()
+        with self.assertRaises(exceptions.RemoteStateError):
+            self.remote.last_channel()
+
+        self.remote.set_channel(self.remote.settings.min_channel + 5)
+        self.assertEqual(self.remote.current_channel, self.remote.settings.min_channel + 5)
+        self.remote.last_channel()
+        self.assertEqual(self.remote.current_channel, self.remote.settings.default_channel)
+
+        self.remote.last_channel()
+        self.assertEqual(self.remote.current_channel, self.remote.settings.min_channel + 5)
+
     def test_volume_limits_and_mute(self) -> None:
         self.remote.power_on()
         self.remote.increase_volume(500)
