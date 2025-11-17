@@ -1,43 +1,218 @@
-# Predator Analytics — Коротке універсальне ТЗ
+# Predator Analytics v13 — Copilot-Friendly TechSpec
 
-## 1. Призначення
-Створити єдиний портал аналітики та розвідки для завантаження даних, виявлення аномалій/ризиків, прогнозування та взаємодії з AI-агентами.
+## Purpose
+Autonomous MAS analytics platform for customs/tax/OSINT data. GitOps-only. Full automation. Umbrella Helm charts. 58 LLM, Ollama-first.
 
-## 2. Основні користувачі та ролі
-- **Guest**: лендинг, логін/реєстрація, тарифи.
-- **Client**: My Daily Feed, чат з AI, джерела даних, базові аналітичні модулі, комплаєнс без розкриття PII, звіти, налаштування.
-- **Pro**: усе з Client + розкриття PII (з аудитом), OpenSearch Dashboards, розширені модулі (3D/графи), частковий моніторинг.
-- **Admin/SRE**: усе з Pro + моніторинг (Grafana/Loki/Tempo), карта агентів, керування доступом.
+## 1. Core Stack Overview
 
-## 3. Ключові компоненти
-- **Front-end**: React Nexus Core (SPA) з i18n, темами, PWA; вбудовані OpenWebUI (чат) та OpenSearch/Grafana (аналітика/моніторинг) через iframe/lazy-load.
-- **Back-end**: FastAPI + Celery, черги (Kafka/RabbitMQ), MinIO для файлів, Keycloak (OIDC) для SSO/RBAC.
-- **Дані та сховище**: PostgreSQL/TimescaleDB, OpenSearch, Qdrant, Redis кеш.
-- **LLM/AI**: локальні моделі через Ollama, зовнішні провайдери через роутер; STT/TTS (Whisper + движок TTS); MAS з декількох агентів.
+### Infrastructure / DevOps
+- Kubernetes: k3s (dev), RKE2 (prod)
+- CI/CD: Tekton + GitHub Actions
+- GitOps: ArgoCD + Argo Rollouts
+- IaC: Terraform (Proxmox/libvirt)
+- Backup: Velero + Restic
+- Chaos: LitmusChaos
+- Container: Docker, Docker Compose
 
-## 4. Функції за напрямами
-- **Завантаження/ETL**: прийом CSV/XLSX/JSON/XML/PDF до 1 ГБ; пайплайн Завантаження → Парсинг → Валідація → Індексація; реальний час через WebSocket; історія завантажень.
-- **Аналітика**: аномалії, корупційні/лобістські зв’язки, фіктивні операції, прогноз потоків/попиту, гео/3D візуалізація, графи зв’язків, індикатори ризику.
-- **Пошук**: повнотекстовий (OpenSearch), семантичний (Qdrant), гібридний; смарт-фільтри та пояснення AI.
-- **Чат/AI**: OpenWebUI з історією, файлами, STT/TTS, фідбеком 👍/👎; стрім відповіді.
-- **Комплаєнс/PII**: маскування для Client, перемикач розкриття для Pro (логування подій).
-- **Моніторинг**: Grafana/Loki/Tempo для Admin/SRE; карта агентів MAS зі статусами.
+### Security
+- Zero Trust
+- Keycloak (OIDC, RBAC, ABAC, MFA)
+- Vault + ExternalSecrets
+- Istio (mTLS)
+- Kyverno/OPA
+- Trivy, Falco, Cosign signing
+- NGINX/WAF (Wallarm)
 
-## 5. Нефункціональні вимоги (узагальнено)
-- **Продуктивність**: швидка індексація/ETL, висока пропускна здатність embeddings.
-- **Надійність/DR**: SLA 99.99%, RTO ≤ 60 хв, RPO ≤ 15 хв, резервні копії.
-- **Безпека**: Zero Trust, mTLS, RBAC через Keycloak, PII-маскінг, жодних секретів у коді.
-- **Масштабованість**: Kubernetes + GitOps (ArgoCD), HPA/KEDA, edge-сценарії.
+### Backend
+- FastAPI
+- Kafka/Redpanda
+- Celery + Redis
+- CDC: Debezium
+- Observability: Prometheus, Grafana, Loki, Tempo
+- AutoHeal + SelfImprovement agents
 
-## 6. Інтеграції та API-патерни
-- REST + WebSocket; Bearer JWT з Keycloak.
-- Pre-signed URL для завантаження/завантаження файлів (MinIO).
-- Події/стрім для довготривалих задач (ETL, чат).
+### Data
+- PostgreSQL + TimescaleDB
+- OpenSearch
+- Qdrant
+- Redis
+- MinIO
 
-## 7. UX принципи
-- i18n (UA/EN), доступність, адаптивність, офлайн-повідомлення.
-- Голосові дії: кнопки 🎙️ (STT) і 🔊 (TTS) там, де доречно.
-- Lazy-load важких модулів (3D, OpenWebUI, OpenSearch, Grafana).
+### AI / LLM
+- Ollama (Gemma/Mistral/LLaMA/OpenHermes/etc.)
+- 58 models via router + arbiter
+- Embeddings: nomic-embed-text, mxbai, bge-m3
+- LoRA/PEFT fine-tuning
+- MLflow
 
-## 8. Очікуваний результат
-Єдиний портал із повним життєвим циклом даних: від збору та пошуку до аналітики, прогнозів і моніторингу, готовий до продакшену та масштабування.
+### MAS (Multi-Agent System)
+- 30+ agents: Retriever, Miner, Forecast, CorruptionDetector, LobbyMap, QueryPlanner, Arbiter, AutoHeal, SelfImprovement, etc.
+- Orchestration: LangGraph / CrewAI
+
+### ETL / Parsing
+- pandas, pdfplumber, Telethon, Playwright, Scrapy
+
+### Frontend
+- React Nexus Core
+- OpenWebUI
+- OpenSearch Dashboards
+
+## 2. System Flow (E2E)
+[UI/Voice] → [FastAPI/Kong] → [Keycloak Auth]
+→ [Ingest/ETL: pandas/pdfplumber/Telethon/Playwright]
+→ [PG/Timescale] → [CDC Debezium]
+→ [Qdrant + Embeddings via Ollama]
+→ [OpenSearch FT Search]
+→ [MAS Agents] → [Model Arbiter / 58 models]
+→ [Result: Insights/Graphs/Newspaper]
+→ [Self-Learning: Feedback → LoRA → Canary → Promote]
+
+## 3. GitHub Actions Integration Goals
+
+### Required Workflows
+1. **build.yml**
+   - Build Docker images
+   - Run tests
+   - Run Trivy scan
+   - Generate SBOM via Syft
+   - Cosign-sign artifacts
+   - Push to GHCR
+2. **deploy.yml**
+   - Commit Helm values → GitOps repo
+   - Trigger ArgoCD sync
+   - Canary rollout via Argo Rollouts CRD
+   - Validate metrics (latency < SLO threshold)
+3. **etl-test.yml**
+   - Run ETL tests with pandas/pdfplumber
+   - Spin up ephemeral PG/OS/Qdrant via docker-compose
+   - Validate CDC → Qdrant sync
+4. **llm-test.yml**
+   - Run embedding tests (Ollama)
+   - Run arbiter-comparison tests
+   - Run LoRA training dry-run
+5. **chaos-check.yml**
+   - Trigger LitmusChaos experiment via Kubernetes CRD
+   - Ensure AutoHeal restores cluster
+
+## 4. Copilot-Friendly Module Map
+```
+/infra
+  /terraform
+  /helm
+    /umbrella
+    /fastapi
+    /qdrant
+    /opensearch
+    /ollama
+    /agents
+  /argocd
+
+/backend
+  /api
+  /cdc
+  /etl
+  /agents
+  /llm_router
+  /arbiter
+  /self_heal
+
+/ml
+  /embeddings
+  /lora
+  /mlflow
+
+/frontend
+  /nexus
+  /openwebui
+
+/observability
+  /prometheus
+  /grafana
+  /loki
+  /tempo
+
+/.github/workflows
+  build.yml
+  deploy.yml
+  etl-test.yml
+  llm-test.yml
+  chaos-check.yml
+```
+
+## 5. Minimal GitHub Action Templates (Seeds)
+
+### build.yml
+```yaml
+name: Build & Scan
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build image
+      run: docker build -t ghcr.io/${{ github.repository }}:${{ github.sha }} .
+
+    - name: Run tests
+      run: pytest -q
+
+    - name: Scan image (Trivy)
+      uses: aquasecurity/trivy-action@v0.12.0
+      with:
+        image-ref: ghcr.io/${{ github.repository }}:${{ github.sha }}
+
+    - name: Generate SBOM
+      uses: anchore/syft-action@v0.7.0
+
+    - name: Sign image
+      run: cosign sign --key env://COSIGN_KEY ghcr.io/${{ github.repository }}:${{ github.sha }}
+
+    - name: Push image
+      run: docker push ghcr.io/${{ github.repository }}:${{ github.sha }}
+```
+
+### deploy.yml
+```yaml
+name: GitOps Deploy
+
+on:
+  workflow_run:
+    workflows: ["Build & Scan"]
+    types: [ "completed" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Update Helm values
+      run: |
+        yq eval ".image.tag = \"${{ github.sha }}\"" -i helm/umbrella/values.yaml
+
+    - name: Commit & push
+      run: |
+        git config user.name "bot"
+        git config user.email "bot@github"
+        git add .
+        git commit -m "deploy: ${{ github.sha }}"
+        git push
+
+    - name: Trigger ArgoCD sync
+      run: argocd app sync predator --grpc-web
+```
+
+## 6. What Copilot Should Infer
+- Generate Helm charts and Kubernetes YAML (Deploy/Service/Ingress/RBAC).
+- Scaffold ETL code based on the module map.
+- Model MAS agents as Python classes.
+- Produce LoRA training pipelines.
+- Build CI/CD and GitOps workflows.
+- Update model router/arbiter logic.
+- Understand E2E dataflow for RAG/CDC/ETL.
