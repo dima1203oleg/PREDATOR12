@@ -73,3 +73,14 @@ For a concrete list of gaps and next actions to enable full ArgoCD-driven delive
 
 ## GitHub Actions deploy workflow
 The repository includes a GitOps-oriented workflow at `.github/workflows/deploy.yml` that can update Helm values (when `deploy/helm/umbrella/values.yaml` exists) and trigger an ArgoCD sync when the `ARGOCD_SERVER`, `ARGOCD_AUTH_TOKEN`, and optional `ARGOCD_APP` secrets are configured. Without these assets and secrets the workflow exits gracefully. The CI workflow also runs Helm lint/template checks to prevent broken Kubernetes manifests from merging.
+
+## Validation runs
+To quickly verify repository syntax and builds after dependency refreshes or workflow updates, run:
+
+```bash
+npm install
+npm run build
+python -m compileall app
+```
+
+These steps mirror the CI checks used to validate the SPA and FastAPI sources.
