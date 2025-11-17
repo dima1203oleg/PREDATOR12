@@ -1,0 +1,59 @@
+name: Kubernetes Autoheal Guard
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+jobs:
+  guard:
+    name: Lint, render, and optionally auto-heal
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+
+      - name: Install kubeconform
+        run: |
+          KUBECONFORM_VERSION=v0.6.7
+          sudo curl -L "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64" -o /usr/local/bin/kubeconform
+          sudo chmod +x /usr/local/bin/kubeconform
+
+      - name: Lint Helm chart
+        run: helm lint deploy/helm/umbrella
+
+      - name: Render manifests
+        run: helm template predator deploy/helm/umbrella --set frontend.image.tag=autoheal --set backend.image.tag=autoheal > rendered.yaml
+
+      - name: Validate manifests with kubeconform
+        run: kubeconform -strict -ignore-missing-schemas -summary rendered.yaml
+
+      - name: Install ArgoCD CLI
+        if: ${{ secrets.ARGOCD_SERVER != '' && secrets.ARGOCD_AUTH_TOKEN != '' }}
+        run: |
+          ARGOCD_VERSION=v2.11.7
+          sudo curl -sL "https://github.com/argoproj/argo-cd/releases/download/${ARGOCD_VERSION}/argocd-linux-amd64" -o /usr/local/bin/argocd
+          sudo chmod +x /usr/local/bin/argocd
+
+      - name: Auto-heal via ArgoCD sync (optional)
+        if: ${{ secrets.ARGOCD_SERVER != '' && secrets.ARGOCD_AUTH_TOKEN != '' && secrets.ARGOCD_APP != '' }}
+        env:
+          ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
+          ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
+          ARGOCD_APP: ${{ secrets.ARGOCD_APP }}
+          ARGOCD_AUTOHEAL: ${{ secrets.ARGOCD_AUTOHEAL || 'false' }}
+        run: |
+          if [ "$ARGOCD_AUTOHEAL" = "true" ]; then
+            echo "Attempting ArgoCD sync for $ARGOCD_APP on $ARGOCD_SERVER"
+            argocd login "$ARGOCD_SERVER" --grpc-web --auth-token "$ARGOCD_AUTH_TOKEN"
+            argocd app sync "$ARGOCD_APP" --grpc-web --retry-limit 2 --timeout 300
+          else
+            echo "ARGOCD_AUTOHEAL disabled; skipping sync"
+          fi
+
+      - name: Report missing ArgoCD secrets
+        if: ${{ secrets.ARGOCD_SERVER == '' || secrets.ARGOCD_AUTH_TOKEN == '' || secrets.ARGOCD_APP == '' }}
+        run: echo "Skipping ArgoCD auto-heal – ARGOCD_SERVER, ARGOCD_AUTH_TOKEN, or ARGOCD_APP secret not configured"

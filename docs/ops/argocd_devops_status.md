@@ -5,7 +5,7 @@ This repository now contains starter GitOps assets and Kubernetes templates but 
 ## Current state
 - **ArgoCD assets**: A sample `Application` manifest lives in `deploy/argocd/predator-app.yaml` targeting the umbrella Helm chart.
 - **Helm/K8s**: A minimal umbrella chart in `deploy/helm/umbrella` deploys the FastAPI backend and frontend with probes and optional HPA.
-- **GitHub Actions**: CI builds/compiles and now lint/renders Helm charts. A deploy workflow can bump Helm values and trigger ArgoCD when secrets and charts are present, but there are still no security scans, SBOM generation, or container signing.
+- **GitHub Actions**: CI builds/compiles and now lint/renders Helm charts. A deploy workflow can bump Helm values and trigger ArgoCD when secrets and charts are present, and a scheduled guard (`ops-autoheal`) validates Helm output and can optionally auto-sync via ArgoCD. There are still no security scans, SBOM generation, or container signing.
 - **Registry & images**: No image build/push steps or registry configuration (GHCR, Docker Hub) are defined.
 - **Secrets/infra**: No Vault/ExternalSecrets templates or `kubeconfig`/cluster targets are defined for CD.
 

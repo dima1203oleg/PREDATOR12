@@ -5,6 +5,7 @@ This repository now ships a minimal Helm umbrella chart (`deploy/helm/umbrella`)
 ## CI coverage
 - `.github/workflows/ci.yml` includes a `kubernetes` job that runs `helm lint` and `helm template` to catch syntax and rendering issues early.
 - The deploy workflow reuses Helm linting before updating image tags and calling ArgoCD, preventing broken charts from reaching GitOps.
+- The scheduled guard workflow `.github/workflows/ops-autoheal.yml` runs every 6 hours (and via `workflow_dispatch`) to lint, render, and kubeconform-validate manifests. When `ARGOCD_AUTOHEAL=true` and ArgoCD secrets are configured, it attempts an automated sync for hands-off recovery.
 
 ## Self-healing and redirection of failed tasks
 - Pods expose readiness/liveness probes hitting `/health` on the backend and `/` on the frontend. Kubernetes restarts unhealthy pods automatically.
@@ -19,4 +20,5 @@ This repository now ships a minimal Helm umbrella chart (`deploy/helm/umbrella`)
 
 ## Updating workflows
 - Ensure `ARGOCD_SERVER`, `ARGOCD_AUTH_TOKEN`, and optional `ARGOCD_APP` secrets are configured to allow `.github/workflows/deploy.yml` to trigger syncs.
+- To enable automatic syncs from the guard workflow, also set `ARGOCD_AUTOHEAL=true` and reuse the same ArgoCD secrets.
 - Use GitHub Environments or OIDC to scope ArgoCD credentials; avoid committing tokens or kubeconfigs.

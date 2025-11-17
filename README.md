@@ -68,7 +68,7 @@ This repository is not yet production-ready for local deployment. It ships a ske
 ## ArgoCD, Kubernetes, and DevOps status
 - Minimal GitOps assets now exist: `deploy/helm/umbrella` Helm chart for frontend/backend and `deploy/argocd/predator-app.yaml` to register the release in ArgoCD.
 - Self-healing probes and optional autoscaling are built into the chart to restart failed pods automatically.
-- GitHub Actions workflows lint and render the chart to catch syntax issues before triggering ArgoCD.
+- GitHub Actions workflows lint and render the chart to catch syntax issues before triggering ArgoCD. A scheduled guard (`.github/workflows/ops-autoheal.yml`) runs every 6 hours (or on demand) to lint, template, and kubeconform-validate the chart; when ArgoCD secrets are present and `ARGOCD_AUTOHEAL=true`, it will also attempt an automated sync.
 For a concrete list of gaps and next actions to enable full ArgoCD-driven delivery (Apps, Helm charts, secrets, GitHub Actions enhancements, and validation steps), see `docs/ops/argocd_devops_status.md` and `docs/ops/kubernetes_actions.md`.
 
 ## GitHub Actions deploy workflow
