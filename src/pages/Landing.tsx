@@ -15,28 +15,28 @@ export function Landing() {
         <Grid container spacing={4} alignItems="center">
           <Grid size={{ xs: 12, md: 7 }}>
             <Typography variant="h3" gutterBottom>
-              Predator Analytics Platform
+              {t('landingTitle')}
             </Typography>
             <Typography variant="body1" color="text.secondary" paragraph>
-              Єдиний веб-портал з My Daily Feed, інтегрованим AI-чатом, аналітикою та моніторингом для ролей Client, Pro та Admin.
+              {t('landingSubtitle')}
             </Typography>
             <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
               <Button variant="contained" component={RouterLink} to="/auth/login">
                 {t('login')}
               </Button>
               <Button variant="outlined" component={RouterLink} to="/auth/register">
-                Зареєструватися
+                {t('ctaRegister')}
               </Button>
             </Stack>
           </Grid>
           <Grid size={{ xs: 12, md: 5 }}>
             <Paper variant="outlined" sx={{ p: 3 }}>
-              <Typography variant="h6">Тарифи</Typography>
+              <Typography variant="h6">{t('tariffsTitle')}</Typography>
               <Typography variant="body2" color="text.secondary">
-                Guest · Client · Pro · Admin
+                {t('tariffsSubtitle')}
               </Typography>
               <Typography variant="body2" sx={{ mt: 1 }}>
-                Keycloak OIDC, OpenWebUI, OpenSearch Dashboards, Grafana embedded через React Nexus Core.
+                {t('stackNote')}
               </Typography>
             </Paper>
           </Grid>

@@ -5,6 +5,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Button from '@mui/material/Button';
+import { useTranslation } from 'react-i18next';
 
 const reports = [
   { name: 'Daily intelligence', status: 'Ready' },
@@ -12,23 +13,24 @@ const reports = [
 ];
 
 export function Reports() {
+  const { t } = useTranslation();
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
-        Звіти
+        {t('reportsTitle')}
       </Typography>
       <Paper sx={{ p: 2 }}>
         <List>
           {reports.map((report) => (
             <ListItem
               key={report.name}
-              secondaryAction={<Button variant="outlined">Download</Button>}
+              secondaryAction={<Button variant="outlined">{t('download')}</Button>}
             >
-              <ListItemText primary={report.name} secondary={`Статус: ${report.status}`} />
+              <ListItemText primary={report.name} secondary={t('reportStatus', { status: report.status })} />
             </ListItem>
           ))}
         </List>
-        <Button variant="contained">Створити новий звіт</Button>
+        <Button variant="contained">{t('createReport')}</Button>
       </Paper>
     </Box>
   );
