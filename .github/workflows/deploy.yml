@@ -1,0 +1,48 @@
+name: GitOps Deploy
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["CI"]
+    types: ["completed"]
+
+jobs:
+  deploy:
+    name: Render GitOps manifests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Update Helm values when available
+        if: ${{ hashFiles('deploy/helm/umbrella/values.yaml') != '' }}
+        run: |
+          yq eval ".image.tag = \"${{ github.sha }}\"" -i deploy/helm/umbrella/values.yaml
+
+      - name: Report missing Helm values
+        if: ${{ hashFiles('deploy/helm/umbrella/values.yaml') == '' }}
+        run: echo "Skipping Helm values update – deploy/helm/umbrella/values.yaml not found in repo"
+
+      - name: Commit GitOps updates
+        if: ${{ hashFiles('deploy/helm/umbrella/values.yaml') != '' }}
+        run: |
+          git config user.name "automation-bot"
+          git config user.email "bot@example.com"
+          git add deploy/helm/umbrella/values.yaml
+          git commit -m "deploy: update image tag to ${{ github.sha }}" || echo "No changes to commit"
+          git push
+
+      - name: Trigger ArgoCD sync when configured
+        if: ${{ env.ARGOCD_SERVER != '' && env.ARGOCD_AUTH_TOKEN != '' }}
+        env:
+          ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
+          ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
+          ARGOCD_APP: ${{ secrets.ARGOCD_APP || 'predator' }}
+        run: |
+          echo "Starting ArgoCD sync for $ARGOCD_APP on $ARGOCD_SERVER"
+          argocd login "$ARGOCD_SERVER" --grpc-web --auth-token "$ARGOCD_AUTH_TOKEN"
+          argocd app sync "$ARGOCD_APP" --grpc-web
+
+      - name: Report missing ArgoCD configuration
+        if: ${{ env.ARGOCD_SERVER == '' || env.ARGOCD_AUTH_TOKEN == '' }}
+        run: echo "Skipping ArgoCD sync – ARGOCD_SERVER or ARGOCD_AUTH_TOKEN secret missing"

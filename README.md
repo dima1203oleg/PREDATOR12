@@ -65,3 +65,6 @@ This repository is not yet production-ready for local deployment. It ships a ske
 
 ## ArgoCD and DevOps status
 ArgoCD/GitOps assets are not included yet. There are no Helm charts, Kubernetes manifests, deploy workflows, or registry publishing steps in this repository. For a concrete list of gaps and next actions to enable ArgoCD-driven delivery (Apps, Helm charts, secrets, GitHub Actions enhancements, and validation steps), see `docs/ops/argocd_devops_status.md`.
+
+## GitHub Actions deploy workflow
+The repository includes a GitOps-oriented workflow at `.github/workflows/deploy.yml` that can update Helm values (when `deploy/helm/umbrella/values.yaml` exists) and trigger an ArgoCD sync when the `ARGOCD_SERVER`, `ARGOCD_AUTH_TOKEN`, and optional `ARGOCD_APP` secrets are configured. Without these assets and secrets the workflow exits gracefully.
