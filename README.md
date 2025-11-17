@@ -50,6 +50,7 @@ npm run preview
 ├── app/                     # FastAPI application entry point
 ├── deploy/docker-compose.yml
 ├── docs/analysis/global_analysis.md
+├── docs/readiness_assessment.md
 ├── public/                  # PWA assets (manifest, service worker)
 ├── src/                     # React Nexus Core SPA
 ├── Dockerfile
@@ -58,3 +59,6 @@ npm run preview
 ├── requirements.txt
 └── README.md
 ```
+
+## Production readiness
+This repository is not yet production-ready for local deployment. It ships a skeleton FastAPI service and placeholder React SPA without real integrations for auth, data stores, MAS agents, observability, or GitOps. See `docs/readiness_assessment.md` for detailed gaps and steps to reach production parity.
