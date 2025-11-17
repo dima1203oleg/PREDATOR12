@@ -10,5 +10,6 @@ The `continuous-guard.yml` workflow provides hands-free, recurring validation an
   - `kubeconform` validation of the rendered manifest bundle
 - **Auto-heal:** if `ARGOCD_SERVER`, `ARGOCD_AUTH_TOKEN`, `ARGOCD_APP`, and `ARGOCD_AUTOHEAL=true` are provided as secrets, ArgoCD sync is triggered after successful checks to converge Kubernetes state automatically.
 - **Missing secrets reporting:** when ArgoCD secrets are absent, the workflow completes the verification steps and emits guidance instead of failing.
+- **Collision avoidance:** uses GitHub Actions concurrency groups to cancel overlapping runs per branch so only the latest verification/remediation attempt proceeds.
 
 Use this workflow to keep Kubernetes manifests, frontend, and backend syntax continuously validated and—when authorized—self-remediated without manual intervention.
