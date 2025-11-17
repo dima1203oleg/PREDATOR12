@@ -45,3 +45,19 @@ jobs:
 
       - name: Compile sources
         run: python -m compileall app
+
+  kubernetes:
+    name: Kubernetes lint & render
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+
+      - name: Lint Helm chart
+        run: helm lint deploy/helm/umbrella
+
+      - name: Render manifests
+        run: helm template predator deploy/helm/umbrella --set frontend.image.tag=ci --set backend.image.tag=ci

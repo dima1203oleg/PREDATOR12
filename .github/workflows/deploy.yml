@@ -14,10 +14,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+
+      - name: Lint Helm chart
+        run: helm lint deploy/helm/umbrella
+
       - name: Update Helm values when available
         if: ${{ hashFiles('deploy/helm/umbrella/values.yaml') != '' }}
         run: |
-          yq eval ".image.tag = \"${{ github.sha }}\"" -i deploy/helm/umbrella/values.yaml
+          yq eval ".frontend.image.tag = \"${{ github.sha }}\"" -i deploy/helm/umbrella/values.yaml
+          yq eval ".backend.image.tag = \"${{ github.sha }}\"" -i deploy/helm/umbrella/values.yaml
 
       - name: Report missing Helm values
         if: ${{ hashFiles('deploy/helm/umbrella/values.yaml') == '' }}
@@ -33,7 +40,7 @@ jobs:
           git push
 
       - name: Trigger ArgoCD sync when configured
-        if: ${{ env.ARGOCD_SERVER != '' && env.ARGOCD_AUTH_TOKEN != '' }}
+        if: ${{ secrets.ARGOCD_SERVER != '' && secrets.ARGOCD_AUTH_TOKEN != '' }}
         env:
           ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
           ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}

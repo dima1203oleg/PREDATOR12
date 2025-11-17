@@ -48,7 +48,9 @@ npm run preview
 ## Project Structure
 ```
 ├── app/                     # FastAPI application entry point
+├── deploy/argocd/predator-app.yaml
 ├── deploy/docker-compose.yml
+├── deploy/helm/umbrella/      # Minimal Helm chart for frontend/backend
 ├── docs/analysis/global_analysis.md
 ├── docs/readiness_assessment.md
 ├── public/                  # PWA assets (manifest, service worker)
@@ -61,10 +63,13 @@ npm run preview
 ```
 
 ## Production readiness
-This repository is not yet production-ready for local deployment. It ships a skeleton FastAPI service and placeholder React SPA without real integrations for auth, data stores, MAS agents, observability, or GitOps. See `docs/readiness_assessment.md` for detailed gaps and steps to reach production parity.
+This repository is not yet production-ready for local deployment. It ships a skeleton FastAPI service and placeholder React SPA without real integrations for auth, data stores, MAS agents, observability, or GitOps. A minimal Helm chart and ArgoCD `Application` scaffold are now included to validate Kubernetes/GitOps wiring but still require real images, secrets, and infrastructure. See `docs/readiness_assessment.md` for detailed gaps and steps to reach production parity.
 
-## ArgoCD and DevOps status
-ArgoCD/GitOps assets are not included yet. There are no Helm charts, Kubernetes manifests, deploy workflows, or registry publishing steps in this repository. For a concrete list of gaps and next actions to enable ArgoCD-driven delivery (Apps, Helm charts, secrets, GitHub Actions enhancements, and validation steps), see `docs/ops/argocd_devops_status.md`.
+## ArgoCD, Kubernetes, and DevOps status
+- Minimal GitOps assets now exist: `deploy/helm/umbrella` Helm chart for frontend/backend and `deploy/argocd/predator-app.yaml` to register the release in ArgoCD.
+- Self-healing probes and optional autoscaling are built into the chart to restart failed pods automatically.
+- GitHub Actions workflows lint and render the chart to catch syntax issues before triggering ArgoCD.
+For a concrete list of gaps and next actions to enable full ArgoCD-driven delivery (Apps, Helm charts, secrets, GitHub Actions enhancements, and validation steps), see `docs/ops/argocd_devops_status.md` and `docs/ops/kubernetes_actions.md`.
 
 ## GitHub Actions deploy workflow
-The repository includes a GitOps-oriented workflow at `.github/workflows/deploy.yml` that can update Helm values (when `deploy/helm/umbrella/values.yaml` exists) and trigger an ArgoCD sync when the `ARGOCD_SERVER`, `ARGOCD_AUTH_TOKEN`, and optional `ARGOCD_APP` secrets are configured. Without these assets and secrets the workflow exits gracefully.
+The repository includes a GitOps-oriented workflow at `.github/workflows/deploy.yml` that can update Helm values (when `deploy/helm/umbrella/values.yaml` exists) and trigger an ArgoCD sync when the `ARGOCD_SERVER`, `ARGOCD_AUTH_TOKEN`, and optional `ARGOCD_APP` secrets are configured. Without these assets and secrets the workflow exits gracefully. The CI workflow also runs Helm lint/template checks to prevent broken Kubernetes manifests from merging.
