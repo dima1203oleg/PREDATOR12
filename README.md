@@ -69,7 +69,8 @@ This repository is not yet production-ready for local deployment. It ships a ske
 - Minimal GitOps assets now exist: `deploy/helm/umbrella` Helm chart for frontend/backend and `deploy/argocd/predator-app.yaml` to register the release in ArgoCD.
 - Self-healing probes and optional autoscaling are built into the chart to restart failed pods automatically.
 - GitHub Actions workflows lint and render the chart to catch syntax issues before triggering ArgoCD. A scheduled guard (`.github/workflows/ops-autoheal.yml`) runs every 6 hours (or on demand) to lint, template, and kubeconform-validate the chart; when ArgoCD secrets are present and `ARGOCD_AUTOHEAL=true`, it will also attempt an automated sync.
-For a concrete list of gaps and next actions to enable full ArgoCD-driven delivery (Apps, Helm charts, secrets, GitHub Actions enhancements, and validation steps), see `docs/ops/argocd_devops_status.md` and `docs/ops/kubernetes_actions.md`.
+- Continuous verification now runs every 30 minutes via `.github/workflows/continuous-guard.yml`, executing the same build/compile/Helm checks as CI before optionally triggering ArgoCD auto-heal when the required secrets permit hands-free remediation.
+For a concrete list of gaps and next actions to enable full ArgoCD-driven delivery (Apps, Helm charts, secrets, GitHub Actions enhancements, and validation steps), see `docs/ops/argocd_devops_status.md`, `docs/ops/kubernetes_actions.md`, and `docs/ops/continuous_guard.md`.
 
 ## GitHub Actions deploy workflow
 The repository includes a GitOps-oriented workflow at `.github/workflows/deploy.yml` that can update Helm values (when `deploy/helm/umbrella/values.yaml` exists) and trigger an ArgoCD sync when the `ARGOCD_SERVER`, `ARGOCD_AUTH_TOKEN`, and optional `ARGOCD_APP` secrets are configured. Without these assets and secrets the workflow exits gracefully. The CI workflow also runs Helm lint/template checks to prevent broken Kubernetes manifests from merging.

@@ -1,0 +1,93 @@
+name: Continuous Guard
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+jobs:
+  verify:
+    name: CI parity sweep
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install backend dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Compile backend sources
+        run: python -m compileall app
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+
+      - name: Lint Helm umbrella chart
+        run: helm lint deploy/helm/umbrella
+
+      - name: Render manifests for validation
+        run: helm template predator deploy/helm/umbrella --set frontend.image.tag=guard --set backend.image.tag=guard > rendered.yaml
+
+      - name: Install kubeconform
+        run: |
+          KUBECONFORM_VERSION=v0.6.7
+          sudo curl -L "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64" -o /usr/local/bin/kubeconform
+          sudo chmod +x /usr/local/bin/kubeconform
+
+      - name: Validate manifests with kubeconform
+        run: kubeconform -strict -ignore-missing-schemas -summary rendered.yaml
+
+  autoheal:
+    name: ArgoCD auto-heal
+    needs: verify
+    if: needs.verify.result == 'success' && secrets.ARGOCD_SERVER != '' && secrets.ARGOCD_AUTH_TOKEN != '' && secrets.ARGOCD_APP != ''
+    runs-on: ubuntu-latest
+    env:
+      ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
+      ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
+      ARGOCD_APP: ${{ secrets.ARGOCD_APP }}
+      ARGOCD_AUTOHEAL: ${{ secrets.ARGOCD_AUTOHEAL || 'false' }}
+    steps:
+      - name: Install ArgoCD CLI
+        run: |
+          ARGOCD_VERSION=v2.11.7
+          sudo curl -sL "https://github.com/argoproj/argo-cd/releases/download/${ARGOCD_VERSION}/argocd-linux-amd64" -o /usr/local/bin/argocd
+          sudo chmod +x /usr/local/bin/argocd
+
+      - name: Trigger ArgoCD sync when enabled
+        run: |
+          if [ "$ARGOCD_AUTOHEAL" = "true" ]; then
+            echo "Starting ArgoCD sync for $ARGOCD_APP on $ARGOCD_SERVER after successful guard run"
+            argocd login "$ARGOCD_SERVER" --grpc-web --auth-token "$ARGOCD_AUTH_TOKEN"
+            argocd app sync "$ARGOCD_APP" --grpc-web --retry-limit 2 --timeout 300
+          else
+            echo "ARGOCD_AUTOHEAL disabled; skipping sync"
+          fi
+
+  missing-secrets:
+    name: Report missing ArgoCD secrets
+    needs: verify
+    if: needs.verify.result == 'success' && (secrets.ARGOCD_SERVER == '' || secrets.ARGOCD_AUTH_TOKEN == '' || secrets.ARGOCD_APP == '')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Emit guidance
+        run: echo "Skipping ArgoCD auto-heal – configure ARGOCD_SERVER, ARGOCD_AUTH_TOKEN, and ARGOCD_APP secrets to enable continuous remediation"
