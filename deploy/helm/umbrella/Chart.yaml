@@ -1,0 +1,6 @@
+apiVersion: v2
+name: predator-umbrella
+description: Umbrella chart to deploy Predator Analytics frontend and backend
+version: 0.1.0
+appVersion: 0.1.0
+type: application
