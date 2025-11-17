@@ -62,3 +62,6 @@ npm run preview
 
 ## Production readiness
 This repository is not yet production-ready for local deployment. It ships a skeleton FastAPI service and placeholder React SPA without real integrations for auth, data stores, MAS agents, observability, or GitOps. See `docs/readiness_assessment.md` for detailed gaps and steps to reach production parity.
+
+## ArgoCD and DevOps status
+ArgoCD/GitOps assets are not included yet. There are no Helm charts, Kubernetes manifests, deploy workflows, or registry publishing steps in this repository. For a concrete list of gaps and next actions to enable ArgoCD-driven delivery (Apps, Helm charts, secrets, GitHub Actions enhancements, and validation steps), see `docs/ops/argocd_devops_status.md`.
