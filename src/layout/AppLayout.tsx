@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import AppBar from '@mui/material/AppBar';
@@ -23,6 +23,7 @@ import MenuItemM from '@mui/material/MenuItem';
 import Avatar from '@mui/material/Avatar';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
+import Alert from '@mui/material/Alert';
 import HomeIcon from '@mui/icons-material/Home';
 import ChatIcon from '@mui/icons-material/Chat';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -49,6 +50,7 @@ export function AppLayout() {
   const [themeMode, setThemeMode] = useState<'light' | 'dark'>('light');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isOnline, setIsOnline] = useState<boolean>(typeof navigator !== 'undefined' ? navigator.onLine : true);
   const navigate = useNavigate();
 
   const theme = useMemo(() => buildTheme(themeMode), [themeMode]);
@@ -80,6 +82,17 @@ export function AppLayout() {
   const handleThemeToggle = () => {
     setThemeMode((prev) => (prev === 'light' ? 'dark' : 'light'));
   };
+
+  useEffect(() => {
+    const goOnline = () => setIsOnline(true);
+    const goOffline = () => setIsOnline(false);
+    window.addEventListener('online', goOnline);
+    window.addEventListener('offline', goOffline);
+    return () => {
+      window.removeEventListener('online', goOnline);
+      window.removeEventListener('offline', goOffline);
+    };
+  }, []);
 
   const drawer = (
     <div>
@@ -182,6 +195,11 @@ export function AppLayout() {
         <Box component="main" sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}>
           <Toolbar />
           <Container maxWidth="xl">
+            {!isOnline && (
+              <Alert severity="warning" sx={{ mb: 2 }} role="status">
+                {t('offlineNotice')}
+              </Alert>
+            )}
             <Outlet />
           </Container>
         </Box>
