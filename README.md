@@ -1,18 +1,12 @@
-# Predator12 Service
+# Predator Analytics Platform
 
-This repository now contains a minimal FastAPI service prepared for container-based deployment. It includes:
+This repository now bundles a minimal FastAPI backend alongside a React + TypeScript SPA ("React Nexus Core") that embeds the Predator Analytics experience: My Daily Feed, OpenWebUI chat, data sources, analytics, compliance, reports, and admin observability views.
 
-- Global deployment analysis and remediation plan.
-- Production-ready application skeleton with health checks.
-- Docker-based workflow for local development and deployment.
+## Backend (FastAPI)
+- Health endpoints at `/` and `/health`.
+- See `requirements.txt`, `Dockerfile`, and `deploy/docker-compose.yml` for containerized execution.
 
-## Getting Started
-
-### Prerequisites
-- Python 3.11+
-- Docker (optional but recommended for parity with deployment)
-
-### Local Development
+### Backend Local Development
 ```bash
 python -m venv .venv
 source .venv/bin/activate
@@ -20,39 +14,44 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-The API will be accessible at `http://localhost:8000` with a health check endpoint at `/health`.
-
-### Container Deployment
+### Backend Container Deployment
 ```bash
 docker build -t predator12:latest .
 docker run -p 8000:8000 predator12:latest
 ```
 
-Alternatively, use Docker Compose for a reproducible environment:
+Or with Compose:
 ```bash
 cd deploy
 docker compose up --build
 ```
 
-### Health Checks
-- `GET /health`: Returns `{ "status": "ok" }` for readiness/liveness probes.
-- `GET /`: Returns a message confirming the service is running.
+## Frontend (React Nexus Core)
+SPA that wires role-aware navigation, i18n (UA/EN), light/dark themes, PWA manifest/service worker, and placeholder integrations for OpenWebUI, OpenSearch Dashboards, and Grafana.
+
+### Frontend Development
+```bash
+npm install
+npm run dev
+```
+Visit `http://localhost:5173`. Use the mock login to switch roles (Client/Pro/Admin) and see conditional navigation.
+
+### Frontend Build
+```bash
+npm run build
+npm run preview
+```
 
 ## Project Structure
 ```
-├── app
-│   └── main.py            # FastAPI application entry point
-├── deploy
-│   └── docker-compose.yml # Local/remote orchestration example
-├── docs
-│   └── analysis
-│       └── global_analysis.md
-├── Dockerfile             # Container build definition
-├── requirements.txt       # Python dependencies
-└── README.md              # This documentation
+├── app/                     # FastAPI application entry point
+├── deploy/docker-compose.yml
+├── docs/analysis/global_analysis.md
+├── public/                  # PWA assets (manifest, service worker)
+├── src/                     # React Nexus Core SPA
+├── Dockerfile
+├── index.html
+├── package.json / package-lock.json
+├── requirements.txt
+└── README.md
 ```
-
-## Next Steps
-- Add unit/integration tests and wire them into CI.
-- Extend the API with business logic as required.
-- Configure infrastructure-specific deployment (Kubernetes, cloud services, etc.).

@@ -77,3 +77,9 @@ session_report*
 # Інше
 .DS_Store
 Thumbs.db
+node_modules/
+node_modules/
+dist/
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts
