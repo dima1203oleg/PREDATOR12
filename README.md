@@ -42,6 +42,9 @@ npm run build
 npm run preview
 ```
 
+#### Troubleshooting frontend builds
+- If TypeScript reports missing `vite` or plugin types, ensure dependencies are installed via `npm install`.
+
 ## Project Structure
 ```
 ├── app/                     # FastAPI application entry point
