@@ -22,13 +22,40 @@ export function Compliance() {
   const { t } = useTranslation();
   const role = useAuthStore((state) => state.role);
   const [revealed, setRevealed] = useState<Record<string, boolean>>({});
+  const [pending, setPending] = useState<Record<string, boolean>>({});
+  const [error, setError] = useState<string | null>(null);
 
   const canReveal = role === 'pro' || role === 'admin';
 
-  const handleToggle = (name: string) => {
-    if (!canReveal) return;
-    setRevealed((prev) => ({ ...prev, [name]: !prev[name] }));
-    console.info('PII visibility toggled', { name });
+  const handleToggle = async (name: string) => {
+    if (!canReveal || pending[name]) return;
+
+    const nextState = !revealed[name];
+    setPending((prev) => ({ ...prev, [name]: true }));
+    setError(null);
+
+    try {
+      const response = await fetch('/api/audit/pii-reveal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ counterparty: name, action: nextState ? 'reveal' : 'hide' })
+      });
+
+      if (!response.ok) {
+        throw new Error('pii_audit_failed');
+      }
+
+      const payload = (await response.json().catch(() => ({}))) as { allowed?: boolean };
+      if (payload.allowed === false) {
+        throw new Error('pii_reveal_denied');
+      }
+
+      setRevealed((prev) => ({ ...prev, [name]: nextState }));
+    } catch (err) {
+      setError(t('piiRevealDenied'));
+    } finally {
+      setPending((prev) => ({ ...prev, [name]: false }));
+    }
   };
 
   return (
@@ -49,6 +76,7 @@ export function Compliance() {
           <TableBody>
             {rows.map((row) => {
               const isRevealed = revealed[row.name];
+              const isPending = pending[row.name];
               return (
                 <TableRow key={row.name}>
                   <TableCell>{row.name}</TableCell>
@@ -70,9 +98,10 @@ export function Compliance() {
                   <TableCell>
                     <Button
                       size="small"
-                      disabled={!canReveal}
+                      disabled={!canReveal || isPending}
                       onClick={() => handleToggle(row.name)}
                       variant={canReveal && isRevealed ? 'outlined' : 'contained'}
+                      aria-busy={isPending}
                     >
                       {canReveal && isRevealed ? t('hide') : t('reveal')}
                     </Button>
@@ -83,6 +112,16 @@ export function Compliance() {
           </TableBody>
         </Table>
       </Paper>
+      {error && (
+        <Typography variant="body2" color="error" sx={{ mt: 1 }}>
+          {error}
+        </Typography>
+      )}
+      {canReveal && (
+        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
+          {t('piiRevealAuditNotice')}
+        </Typography>
+      )}
     </Box>
   );
 }

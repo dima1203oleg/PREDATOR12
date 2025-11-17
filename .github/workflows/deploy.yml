@@ -20,12 +20,19 @@ jobs:
 
       - name: Install helpers (yq, argocd)
         run: |
+          set -euo pipefail
           YQ_VERSION=v4.44.3
           ARGOCD_VERSION=v2.11.7
-          sudo curl -sL "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" -o /usr/local/bin/yq
-          sudo chmod +x /usr/local/bin/yq
-          sudo curl -sL "https://github.com/argoproj/argo-cd/releases/download/${ARGOCD_VERSION}/argocd-linux-amd64" -o /usr/local/bin/argocd
-          sudo chmod +x /usr/local/bin/argocd
+
+          curl -sSfL -o yq "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64"
+          curl -sSfL -o yq.sha256 "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/checksums"
+          grep " yq_linux_amd64$" yq.sha256 | sha256sum -c -
+          sudo install -m 0755 yq /usr/local/bin/yq
+
+          curl -sSfL -o argocd "https://github.com/argoproj/argo-cd/releases/download/${ARGOCD_VERSION}/argocd-linux-amd64"
+          curl -sSfL -o argocd.sha256 "https://github.com/argoproj/argo-cd/releases/download/${ARGOCD_VERSION}/argocd-linux-amd64.sha256"
+          echo "$(cat argocd.sha256)  argocd" | sha256sum -c -
+          sudo install -m 0755 argocd /usr/local/bin/argocd
 
       - name: Install Helm
         uses: azure/setup-helm@v4

@@ -44,6 +44,8 @@ const resources = {
       reveal: 'Reveal (Pro)',
       hide: 'Hide',
       piiMasked: 'Masked for Client role',
+      piiRevealDenied: 'PII reveal request was declined. Please try again later or contact an admin.',
+      piiRevealAuditNotice: 'Reveals are audited via backend approval; masking stays active if the request fails.',
       chatTitle: 'Chat Analyst (OpenWebUI)',
       chatDescription:
         'Embedded chat via iframe. Add file upload, STT (🎙️), TTS (🔊), and feedback controls.',
@@ -178,6 +180,8 @@ const resources = {
       reveal: 'Показати (Pro)',
       hide: 'Сховати',
       piiMasked: 'Замасковано для ролі Client',
+      piiRevealDenied: 'Запит на розкриття PII відхилено. Спробуйте пізніше або зверніться до адміністратора.',
+      piiRevealAuditNotice: 'Розкриття перевіряється бекендом та журналюється; маскування лишається, якщо запит не схвалено.',
       chatTitle: 'Чат-Аналітик (OpenWebUI)',
       chatDescription:
         'Вбудований чат через iframe. Додайте підтримку файлів, STT (🎙️), TTS (🔊) та кнопки feedback.',

@@ -53,9 +53,12 @@ jobs:
 
       - name: Install kubeconform
         run: |
+          set -euo pipefail
           KUBECONFORM_VERSION=v0.6.7
-          sudo curl -L "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64" -o /usr/local/bin/kubeconform
-          sudo chmod +x /usr/local/bin/kubeconform
+          curl -sSfL -o kubeconform "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64"
+          curl -sSfL -o kubeconform.sha256 "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.sha256"
+          echo "$(cat kubeconform.sha256)  kubeconform" | sha256sum -c -
+          sudo install -m 0755 kubeconform /usr/local/bin/kubeconform
 
       - name: Validate manifests with kubeconform
         run: kubeconform -strict -ignore-missing-schemas -summary rendered.yaml
@@ -73,9 +76,12 @@ jobs:
     steps:
       - name: Install ArgoCD CLI
         run: |
+          set -euo pipefail
           ARGOCD_VERSION=v2.11.7
-          sudo curl -sL "https://github.com/argoproj/argo-cd/releases/download/${ARGOCD_VERSION}/argocd-linux-amd64" -o /usr/local/bin/argocd
-          sudo chmod +x /usr/local/bin/argocd
+          curl -sSfL -o argocd "https://github.com/argoproj/argo-cd/releases/download/${ARGOCD_VERSION}/argocd-linux-amd64"
+          curl -sSfL -o argocd.sha256 "https://github.com/argoproj/argo-cd/releases/download/${ARGOCD_VERSION}/argocd-linux-amd64.sha256"
+          echo "$(cat argocd.sha256)  argocd" | sha256sum -c -
+          sudo install -m 0755 argocd /usr/local/bin/argocd
 
       - name: Trigger ArgoCD sync when enabled
         run: |

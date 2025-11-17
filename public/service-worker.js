@@ -7,9 +7,12 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  if (!navigator.onLine) {
+  // Provide a gentle offline notice only for navigation requests to avoid
+  // interfering with API calls, non-GET methods, or cross-origin assets.
+  if (!navigator.onLine && event.request.mode === 'navigate') {
     event.respondWith(
       new Response('Ви офлайн, деякі дії недоступні. Please reconnect to continue.', {
+        status: 503,
         headers: { 'Content-Type': 'text/plain; charset=utf-8' }
       })
     );

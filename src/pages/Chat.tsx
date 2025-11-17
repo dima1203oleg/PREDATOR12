@@ -57,7 +57,14 @@ export function Chat() {
         <Typography color="text.secondary">{t('chatDescription')}</Typography>
         <Box sx={{ mt: 2, height: 420, borderRadius: 2, overflow: 'hidden', bgcolor: 'background.default' }}>
           {openWebUiUrl ? (
-            <iframe title="OpenWebUI" src={openWebUiUrl} style={{ width: '100%', height: '100%', border: 0 }} />
+            <iframe
+              title="OpenWebUI"
+              src={openWebUiUrl}
+              style={{ width: '100%', height: '100%', border: 0 }}
+              loading="lazy"
+              sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+              referrerPolicy="no-referrer"
+            />
           ) : (
             <Box
               sx={{
