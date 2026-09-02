@@ -201,7 +201,9 @@ class RemoteControl:
     # ------------------------------------------------------------------
     def _require_on(self) -> None:
         if not self._is_on:
-            raise RemoteStateError("The device must be powered on to perform this action.")
+            raise RemoteStateError(
+                "The device must be powered on to perform this action."
+            )
 
 
 __all__ = ["RemoteControl", "RemoteState"]
