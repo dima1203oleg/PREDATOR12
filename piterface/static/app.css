@@ -1,0 +1,58 @@
+:root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; background: #070a12; color: #eef3ff; }
+* { box-sizing: border-box; }
+body { min-height: 100vh; margin: 0; background: radial-gradient(circle at 50% -20%, #263757 0, #0b1120 38%, #05070d 100%); }
+button, input { font: inherit; }
+button { color: inherit; }
+.shell { width: min(100% - 32px, 560px); margin: 0 auto; padding: 44px 0 32px; }
+.brand { display: flex; align-items: center; gap: 13px; margin-bottom: 22px; }
+.brand-mark { display: grid; place-items: center; width: 45px; height: 45px; border: 1px solid #3c4c6a; border-radius: 14px; background: linear-gradient(145deg, #283653, #10182a); color: #79f5df; font-weight: 800; letter-spacing: -.05em; box-shadow: inset 0 1px #ffffff16, 0 10px 30px #0008; }
+.brand h1, .remote h2 { margin: 0; letter-spacing: -.035em; }
+.brand h1 { font-size: 20px; }
+.eyebrow { margin: 0 0 2px; color: #71809d; font-size: 10px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+.connection { margin-left: auto; color: #91a0ba; font-size: 12px; }
+.connection i { display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: #45e8ae; box-shadow: 0 0 10px #45e8ae; }
+.remote { overflow: hidden; padding: 26px; border: 1px solid #27324a; border-radius: 32px; background: linear-gradient(155deg, #161e30, #0d1321 55%, #090e18); box-shadow: inset 0 1px #ffffff12, 0 28px 80px #000b; }
+.remote-top { display: flex; align-items: center; justify-content: space-between; }
+.remote h2 { font-size: 21px; }
+.power { display: grid; place-items: center; width: 54px; height: 54px; border: 1px solid #3b465b; border-radius: 50%; background: #151d2c; cursor: pointer; box-shadow: inset 0 1px #ffffff18, 0 7px 16px #0008; transition: .2s; }
+.power:hover { transform: translateY(-2px); border-color: #63718c; }
+.power svg { width: 22px; fill: none; stroke: #8795ad; stroke-width: 2; stroke-linecap: round; }
+.device-on .power { border-color: #2b9e8b; background: #123831; box-shadow: inset 0 1px #ffffff18, 0 0 24px #30d8b244; }
+.device-on .power svg { stroke: #62eed5; }
+.display { margin: 24px 0; padding: 22px; border: 1px solid #26334b; border-radius: 20px; background: linear-gradient(145deg, #080d17, #111a2a); text-align: center; box-shadow: inset 0 2px 12px #000a; }
+.display-status { color: #77859e; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.status-dot { display: inline-block; width: 6px; height: 6px; margin-right: 6px; border-radius: 50%; background: #667086; }
+.device-on .status-dot { background: #5aebcb; box-shadow: 0 0 10px #5aebcb; }
+.device-on #power-state { color: #79e6d2; }
+.channel-number { margin-top: 8px; color: #bac7dc; font: 300 68px/1 ui-monospace, SFMono-Regular, monospace; letter-spacing: .08em; text-shadow: 0 0 22px #5988bd33; }
+.device-on .channel-number { color: #f1f6ff; }
+.display > p { margin: 5px 0 20px; color: #66748d; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; }
+.volume-row { display: flex; align-items: center; gap: 11px; color: #72809b; }
+.volume-track { overflow: hidden; flex: 1; height: 4px; border-radius: 9px; background: #263046; }
+.volume-track span { display: block; width: 10%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #43c8eb, #61e9c4); transition: width .2s; }
+.volume-row strong { width: 27px; color: #a9b6cb; font: 12px ui-monospace, monospace; text-align: right; }
+.controls { display: grid; grid-template-columns: 1fr 82px 1fr; align-items: center; gap: 18px; }
+.control-group { text-align: center; }
+.control-label { display: block; margin-bottom: 7px; color: #6f7c93; font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.rocker { overflow: hidden; display: grid; grid-template-rows: 47px 25px 47px; border: 1px solid #2f3a50; border-radius: 25px; background: #111827; box-shadow: 0 9px 22px #0008; }
+.rocker button { border: 0; background: linear-gradient(#1e283a, #151d2c); font-size: 25px; cursor: pointer; }
+.rocker button:hover:not(:disabled) { background: #28364d; color: #6cebd1; }
+.rocker span { display: grid; place-items: center; color: #71809a; font-size: 9px; font-weight: 900; letter-spacing: .12em; }
+.round-button { width: 78px; height: 78px; border: 1px solid #303b50; border-radius: 50%; background: linear-gradient(145deg, #202a3c, #111827); font-size: 25px; cursor: pointer; box-shadow: 0 9px 22px #0008; }
+.round-button small { display: block; margin-top: 2px; color: #6f7d95; font-size: 8px; text-transform: uppercase; }
+button:disabled { cursor: not-allowed; opacity: .38; }
+.channel-form { margin-top: 24px; padding-top: 20px; border-top: 1px solid #222d41; }
+.channel-form label { display: block; margin-bottom: 8px; color: #8794aa; font-size: 12px; }
+.channel-form div { display: flex; gap: 8px; }
+.channel-form input { min-width: 0; flex: 1; padding: 11px 14px; border: 1px solid #303b52; border-radius: 11px; outline: none; background: #0a101c; color: #eef3ff; }
+.channel-form input:focus { border-color: #58d9c1; box-shadow: 0 0 0 3px #58d9c122; }
+.channel-form button, .mute-button { border: 1px solid #334057; border-radius: 11px; background: #1a2435; cursor: pointer; }
+.channel-form button { padding: 0 16px; }
+.mute-button { width: 100%; margin-top: 13px; padding: 13px; }
+.mute-button:hover:not(:disabled), .channel-form button:hover:not(:disabled), .round-button:hover:not(:disabled) { border-color: #527064; color: #67e5cc; }
+.hint { margin: 17px 0 0; color: #647087; font-size: 12px; text-align: center; }
+.toast { position: fixed; bottom: 24px; left: 50%; z-index: 2; translate: -50%; padding: 12px 18px; border: 1px solid #3d967f; border-radius: 12px; background: #112b27; box-shadow: 0 12px 35px #000b; font-size: 13px; }
+.toast.error { border-color: #b84b61; background: #35151d; }
+button:focus-visible, input:focus-visible { outline: 3px solid #71e7d0; outline-offset: 3px; }
+@media (max-width: 520px) { .shell { width: min(100% - 20px, 560px); padding-top: 22px; } .remote { padding: 19px; border-radius: 25px; } .controls { gap: 10px; } .channel-number { font-size: 56px; } .connection { font-size: 10px; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }

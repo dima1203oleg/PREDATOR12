@@ -6,6 +6,7 @@ functions provide reusable helpers that can be imported in tests or called from
 other tooling, while :func:`main` exposes a tiny CLI so the validation can be
 triggered manually.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -120,17 +121,11 @@ def validate_env(
 
     missing_keys = [key for key in required_keys if key not in data]
     if missing_keys:
-        errors.append(
-            "Відсутні обов'язкові ключі: " + ", ".join(sorted(missing_keys))
-        )
+        errors.append("Відсутні обов'язкові ключі: " + ", ".join(sorted(missing_keys)))
 
-    empty_keys = [
-        key for key in required_keys if key in data and not data[key].strip()
-    ]
+    empty_keys = [key for key in required_keys if key in data and not data[key].strip()]
     if empty_keys:
-        errors.append(
-            "Порожні значення для ключів: " + ", ".join(sorted(empty_keys))
-        )
+        errors.append("Порожні значення для ключів: " + ", ".join(sorted(empty_keys)))
 
     if (token := data.get("BOT_TOKEN")) and not _TOKEN_RE.match(token):
         errors.append("BOT_TOKEN має бути у форматі <digits>:<token>")
@@ -147,7 +142,7 @@ def validate_env(
             if not _EMAIL_RE.match(email):
                 errors.append(f"{key} містить некоректну адресу: {email}")
 
-    if (use_powerful := data.get("USE_POWERFUL_SERVERS_ONLY")):
+    if use_powerful := data.get("USE_POWERFUL_SERVERS_ONLY"):
         normalized = use_powerful.lower()
         if normalized not in {"true", "false"}:
             errors.append(
@@ -158,7 +153,7 @@ def validate_env(
                 "Рекомендовано залишати USE_POWERFUL_SERVERS_ONLY=true для чутливих ботів"
             )
 
-    if (gpu_usage := data.get("MAX_GPU_USAGE")):
+    if gpu_usage := data.get("MAX_GPU_USAGE"):
         try:
             value = float(gpu_usage)
         except ValueError:

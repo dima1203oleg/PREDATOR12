@@ -56,12 +56,18 @@ class RemoteControlTestCase(unittest.TestCase):
             self.remote.last_channel()
 
         self.remote.set_channel(self.remote.settings.min_channel + 5)
-        self.assertEqual(self.remote.current_channel, self.remote.settings.min_channel + 5)
+        self.assertEqual(
+            self.remote.current_channel, self.remote.settings.min_channel + 5
+        )
         self.remote.last_channel()
-        self.assertEqual(self.remote.current_channel, self.remote.settings.default_channel)
+        self.assertEqual(
+            self.remote.current_channel, self.remote.settings.default_channel
+        )
 
         self.remote.last_channel()
-        self.assertEqual(self.remote.current_channel, self.remote.settings.min_channel + 5)
+        self.assertEqual(
+            self.remote.current_channel, self.remote.settings.min_channel + 5
+        )
 
     def test_volume_limits_and_mute(self) -> None:
         self.remote.power_on()
@@ -111,15 +117,17 @@ class RemoteSettingsTestCase(unittest.TestCase):
             RemoteSettings.from_mapping({"name": "Test", "unknown": 1})
 
     def test_from_mapping_valid(self) -> None:
-        settings = RemoteSettings.from_mapping({
-            "name": "Custom",
-            "min_channel": 1,
-            "max_channel": 10,
-            "default_channel": 3,
-            "min_volume": 0,
-            "max_volume": 20,
-            "default_volume": 5,
-        })
+        settings = RemoteSettings.from_mapping(
+            {
+                "name": "Custom",
+                "min_channel": 1,
+                "max_channel": 10,
+                "default_channel": 3,
+                "min_volume": 0,
+                "max_volume": 20,
+                "default_volume": 5,
+            }
+        )
         self.assertEqual(settings.name, "Custom")
         self.assertEqual(settings.default_channel, 3)
         self.assertEqual(settings.max_volume, 20)

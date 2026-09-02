@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#090d18">
+    <title>Piter Face — пульт керування</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="brand">
+        <div class="brand-mark" aria-hidden="true">PF</div>
+        <div>
+          <p class="eyebrow">Smart control system</p>
+          <h1>Piter Face</h1>
+        </div>
+        <span class="connection"><i aria-hidden="true"></i> На зв’язку</span>
+      </header>
+
+      <section class="remote" aria-labelledby="remote-title">
+        <div class="remote-top">
+          <div>
+            <p class="eyebrow">Домашній простір</p>
+            <h2 id="remote-title">Головний телевізор</h2>
+          </div>
+          <button class="power" type="button" data-action="power" aria-label="Увімкнути телевізор">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v10M6.3 5.7a8 8 0 1 0 11.4 0"/></svg>
+          </button>
+        </div>
+
+        <div class="display" aria-live="polite" aria-atomic="true">
+          <div class="display-status"><span class="status-dot"></span><span id="power-state">Вимкнено</span></div>
+          <div class="channel-number" id="channel">001</div>
+          <p>Канал</p>
+          <div class="volume-row">
+            <span id="volume-icon" aria-hidden="true">◖</span>
+            <div class="volume-track"><span id="volume-fill"></span></div>
+            <strong id="volume">10</strong>
+          </div>
+        </div>
+
+        <div class="controls">
+          <div class="control-group">
+            <span class="control-label">Канал</span>
+            <div class="rocker">
+              <button type="button" data-action="channel-next" aria-label="Наступний канал">+</button>
+              <span>CH</span>
+              <button type="button" data-action="channel-previous" aria-label="Попередній канал">−</button>
+            </div>
+          </div>
+          <button class="round-button" type="button" data-action="channel-last" aria-label="Повернутися до попереднього каналу">↶<small>Останній</small></button>
+          <div class="control-group">
+            <span class="control-label">Гучність</span>
+            <div class="rocker">
+              <button type="button" data-action="volume-up" aria-label="Збільшити гучність">+</button>
+              <span>VOL</span>
+              <button type="button" data-action="volume-down" aria-label="Зменшити гучність">−</button>
+            </div>
+          </div>
+        </div>
+
+        <form class="channel-form" id="channel-form">
+          <label for="channel-input">Перейти до каналу</label>
+          <div>
+            <input id="channel-input" name="channel" type="number" min="1" max="999" inputmode="numeric" placeholder="1–999" required>
+            <button type="submit">Перейти</button>
+          </div>
+        </form>
+
+        <button class="mute-button" type="button" data-action="mute" id="mute-button">
+          <span aria-hidden="true">◖</span><span id="mute-label">Вимкнути звук</span>
+        </button>
+      </section>
+
+      <p class="hint">Підказка: спочатку увімкніть пристрій кнопкою живлення.</p>
+      <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+    </main>
+  </body>
+</html>

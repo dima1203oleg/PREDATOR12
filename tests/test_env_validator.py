@@ -1,9 +1,4 @@
 import pathlib
-import sys
-
-ROOT = pathlib.Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
 
 import pytest
 
@@ -20,7 +15,7 @@ def test_parse_env_lines_strips_comments_and_quotes():
     content = [
         "# Comment should be ignored\n",
         "BOT_TOKEN=123:ABCDEF\n",
-        "EMAIL_FROM=\"user@example.com\"\n",
+        'EMAIL_FROM="user@example.com"\n',
         " EMPTY= value with spaces \n",
         "SHELL_EXPORT=value # inline comment should be part of value\n",
     ]
@@ -93,7 +88,9 @@ def test_load_env_file(tmp_path: pathlib.Path):
     assert data == {"BOT_TOKEN": "1:token"}
 
 
-def test_main_reports_missing_file(tmp_path: pathlib.Path, capsys: pytest.CaptureFixture[str]):
+def test_main_reports_missing_file(
+    tmp_path: pathlib.Path, capsys: pytest.CaptureFixture[str]
+):
     missing_file = tmp_path / "missing.env"
 
     exit_code = main([str(missing_file)])
@@ -103,7 +100,9 @@ def test_main_reports_missing_file(tmp_path: pathlib.Path, capsys: pytest.Captur
     assert "не знайдено" in captured.err
 
 
-def test_main_outputs_success(tmp_path: pathlib.Path, capsys: pytest.CaptureFixture[str]):
+def test_main_outputs_success(
+    tmp_path: pathlib.Path, capsys: pytest.CaptureFixture[str]
+):
     env_path = tmp_path / "secrets.env"
     env_path.write_text(
         "BOT_TOKEN=123456:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef\n"
